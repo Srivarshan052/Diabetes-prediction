@@ -32,6 +32,37 @@ df.info()
 
 """ CODE FOR DIABETES PREDICTION SYSTEM"""
 
+"""SCATTER PLOT"""
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(8, 6))
+plt.scatter(df['Glucose'], df['BMI'], c=df['Outcome'], cmap='coolwarm')
+plt.xlabel('Glucose')
+plt.ylabel('BMI')
+plt.title('Scatter Plot: Glucose vs. BMI')
+plt.colorbar(label='Outcome')
+plt.show()
+
+"""PIE CHART/ DISTRIBUTION CHART"""
+
+plt.figure(figsize=(6, 6))
+outcome_counts = df['Outcome'].value_counts()
+plt.pie(outcome_counts, labels=outcome_counts.index, autopct='%1.1f%%', startangle=90, colors=['skyblue', 'orange'])
+plt.title('Pie Chart: Outcome Distribution')
+plt.show()
+
+"""BAR GRAPH"""
+
+plt.figure(figsize=(6, 6))
+outcome_counts = df['Outcome'].value_counts()
+plt.bar(outcome_counts.index, outcome_counts.values, color=['skyblue', 'orange'])
+plt.xlabel('Outcome')
+plt.ylabel('Count')
+plt.title('Bar Graph: Outcome Counts')
+plt.xticks(outcome_counts.index, ['No Diabetes', 'Diabetes'])
+plt.show()
+
 # Import necessary libraries
 import pandas as pd
 import numpy as np
@@ -73,33 +104,39 @@ print("Accuracy:", accuracy)
 
 df.hist()
 
-"""SCATTER PLOT"""
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
-import matplotlib.pyplot as plt
+# Load your diabetes dataset (replace 'diabetes.csv' with your dataset file)
+diabetes_data = pd.read_csv('diabetes.csv')
 
-plt.figure(figsize=(8, 6))
-plt.scatter(df['Glucose'], df['BMI'], c=df['Outcome'], cmap='coolwarm')
-plt.xlabel('Glucose')
-plt.ylabel('BMI')
-plt.title('Scatter Plot: Glucose vs. BMI')
-plt.colorbar(label='Outcome')
-plt.show()
+# Define features and target variable
+X = diabetes_data.drop('Outcome', axis=1)  # Features
+y = diabetes_data['Outcome']  # Target variable
 
-"""PIE CHART/ DISTRIBUTION CHART"""
+# Split the dataset into a training set and a testing set
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
-plt.figure(figsize=(6, 6))
-outcome_counts = df['Outcome'].value_counts()
-plt.pie(outcome_counts, labels=outcome_counts.index, autopct='%1.1f%%', startangle=90, colors=['skyblue', 'orange'])
-plt.title('Pie Chart: Outcome Distribution')
-plt.show()
+# Data preprocessing: Standardize the feature values
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
 
-"""BAR GRAPH"""
+# Create and train a Logistic Regression model
+model = LogisticRegression()
+model.fit(X_train, y_train)
 
-plt.figure(figsize=(6, 6))
-outcome_counts = df['Outcome'].value_counts()
-plt.bar(outcome_counts.index, outcome_counts.values, color=['skyblue', 'orange'])
-plt.xlabel('Outcome')
-plt.ylabel('Count')
-plt.title('Bar Graph: Outcome Counts')
-plt.xticks(outcome_counts.index, ['No Diabetes', 'Diabetes'])
-plt.show()
+# Make predictions on the test data
+y_pred = model.predict(X_test)
+
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)
+confusion = confusion_matrix(y_test, y_pred)
+classification_rep = classification_report(y_test, y_pred)
+
+print("Accuracy:", accuracy)
+print("Confusion Matrix:\n", confusion)
+print("Classification Report:\n", classification_rep)
